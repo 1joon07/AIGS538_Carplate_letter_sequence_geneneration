@@ -2,9 +2,12 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 import random
+from xml.etree.ElementTree import Element, SubElement, ElementTree
+import pandas as pd
 
-data_directory = 'C:/Users/Wonjoon_LAB/PycharmProjects/AIGS538_Carplate_letter_sequence_geneneration/CNN letter Dataset'
+data_directory = 'C:/Users/Wonjoon_LAB/PycharmProjects/AIGS538_Carplate_letter_sequence_geneneration/CNN_letter_dataset'
 Generated_dataset_directory='./CNN_generated_dataset'
+Iteration = 5
 
 def plate_image_concatenation (label_sequence= 'ALIS'):
     generated_image_size=(256,64)
@@ -23,14 +26,11 @@ def plate_image_concatenation (label_sequence= 'ALIS'):
 
     widths, heights = zip(*(i.size for i in images))
 
-    # 총 너비와 가장 높은 높이를 계산
     total_width = sum(widths)
     max_height = max(heights)
 
-    # 새로운 이미지 생성 (전체 너비와 가장 높은 높이 사용)
     new_im = Image.new('RGB', (total_width, max_height))
 
-    # 각 이미지를 새 이미지에 붙여넣기
     x_offset = 0
     for im in images:
         new_im.paste(im, (x_offset, 0))
@@ -39,6 +39,7 @@ def plate_image_concatenation (label_sequence= 'ALIS'):
     new_im = new_im.resize(generated_image_size)
 
     return new_im
+
 def PLATE_dataset_generation ():
 
     plate_letters = random_label()
@@ -46,7 +47,8 @@ def PLATE_dataset_generation ():
 
     print(plate_letters)
     plate_image.show()
-    return 0
+    return plate_letters, plate_image
+
 def random_label (label_length=(4,10)):
 
     Length = random.randrange(label_length[0], label_length[1]+1)
@@ -57,8 +59,38 @@ def random_label (label_length=(4,10)):
     letter_sequence = ''.join(random.choice(characters) for _ in range(Length))
 
     return letter_sequence
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    PLATE_dataset_generation()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# def label_xml_generation (file_name, label):
+#     root = Element("Countries")
+#     element1 = Element("Korea")
+#     root.append(element1)
+#
+#     sub_element1 = SubElement(element1, "City")
+#     sub_element1.text = "Seoul"
+#
+#     element2 = Element("Japanese")
+#     root.append(element2)
+#
+#     sub_element2 = SubElement(element2, "City")
+#     sub_element2.text = "Tokyo"
+#
+#     tree = ElementTree(root)
+#
+#     fileName = f'label.xml'
+#     with open(fileName, "wb") as file:
+#         tree.write(file, encoding='utf-8', xml_declaration=True)
+
+if __name__ == '__main__':
+    Filename_list = []
+    Label_list = []
+    for i in range(Iteration):
+        PlateImage_Filename = f'Plate_{i}.png'
+        tmp_label, tmp_plate_image = PLATE_dataset_generation()
+        tmp_plate_image.save(f'{Generated_dataset_directory}/{PlateImage_Filename}', 'png')
+
+        Filename_list.append(PlateImage_Filename)
+        Label_list.append(tmp_label)
+
+    df = pd.DataFrame(Filename_list, columns=['Filename'])
+    df['Label'] = Label_list
+    df.to_csv(f'{Generated_dataset_directory}/Labels.csv', index=False)
