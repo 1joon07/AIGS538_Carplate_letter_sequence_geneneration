@@ -2,15 +2,27 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 import random
-from xml.etree.ElementTree import Element, SubElement, ElementTree
 import pandas as pd
 
-data_directory = 'C:/Users/Wonjoon_LAB/PycharmProjects/AIGS538_Carplate_letter_sequence_geneneration/CNN_letter_dataset'
+## Plate label length setting
+## (x,y) -> length variation from x to y
+Label_length = (4,10)
+
+## Generated image resolution
+generated_image_size=(256,64)
+
+## Number of images to be generated & saved
+Iteration = 200
+
+## Location of source character images
+data_directory = './CNN_letter_dataset'
+
+## Location of the generated dataset
+## a .csv file -> a list of labels
+## .png files -> generated images
 Generated_dataset_directory='./CNN_generated_dataset'
-Iteration = 5
 
 def plate_image_concatenation (label_sequence= 'ALIS'):
-    generated_image_size=(256,64)
 
     image_path_list = []
     for character in label_sequence:
@@ -40,13 +52,13 @@ def plate_image_concatenation (label_sequence= 'ALIS'):
 
     return new_im
 
-def PLATE_dataset_generation ():
+def PLATE_dataset_generation (LABEL_Length):
 
-    plate_letters = random_label()
+    plate_letters = random_label(label_length=LABEL_Length)
     plate_image = plate_image_concatenation(plate_letters)
 
     print(plate_letters)
-    plate_image.show()
+
     return plate_letters, plate_image
 
 def random_label (label_length=(4,10)):
@@ -60,32 +72,12 @@ def random_label (label_length=(4,10)):
 
     return letter_sequence
 
-# def label_xml_generation (file_name, label):
-#     root = Element("Countries")
-#     element1 = Element("Korea")
-#     root.append(element1)
-#
-#     sub_element1 = SubElement(element1, "City")
-#     sub_element1.text = "Seoul"
-#
-#     element2 = Element("Japanese")
-#     root.append(element2)
-#
-#     sub_element2 = SubElement(element2, "City")
-#     sub_element2.text = "Tokyo"
-#
-#     tree = ElementTree(root)
-#
-#     fileName = f'label.xml'
-#     with open(fileName, "wb") as file:
-#         tree.write(file, encoding='utf-8', xml_declaration=True)
-
 if __name__ == '__main__':
     Filename_list = []
     Label_list = []
     for i in range(Iteration):
         PlateImage_Filename = f'Plate_{i}.png'
-        tmp_label, tmp_plate_image = PLATE_dataset_generation()
+        tmp_label, tmp_plate_image = PLATE_dataset_generation(LABEL_Length=Label_length)
         tmp_plate_image.save(f'{Generated_dataset_directory}/{PlateImage_Filename}', 'png')
 
         Filename_list.append(PlateImage_Filename)
