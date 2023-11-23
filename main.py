@@ -3,9 +3,10 @@ from PIL import Image
 import os
 import random
 
+data_directory = 'C:/Users/Wonjoon_LAB/PycharmProjects/AIGS538_Carplate_letter_sequence_geneneration/CNN letter Dataset'
+Generated_dataset_directory='./CNN_generated_dataset'
 
-def plate_image_concatenation (label_sequence= 'BEVIL'):
-    data_directory = 'C:/Users/Wonjoon_LAB/PycharmProjects/AIGS538_Carplate_letter_sequence_geneneration/CNN letter Dataset'
+def plate_image_concatenation (label_sequence= 'ALIS'):
     generated_image_size=(256,64)
 
     image_path_list = []
@@ -38,11 +39,26 @@ def plate_image_concatenation (label_sequence= 'BEVIL'):
     new_im = new_im.resize(generated_image_size)
 
     return new_im
+def PLATE_dataset_generation ():
 
+    plate_letters = random_label()
+    plate_image = plate_image_concatenation(plate_letters)
 
+    print(plate_letters)
+    plate_image.show()
+    return 0
+def random_label (label_length=(4,10)):
 
+    Length = random.randrange(label_length[0], label_length[1]+1)
+
+    all_items = os.listdir(data_directory)
+    characters = [item for item in all_items if os.path.isdir(os.path.join(data_directory, item))]
+
+    letter_sequence = ''.join(random.choice(characters) for _ in range(Length))
+
+    return letter_sequence
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    plate_image_concatenation()
+    PLATE_dataset_generation()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
