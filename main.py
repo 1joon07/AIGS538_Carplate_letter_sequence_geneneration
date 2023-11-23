@@ -12,7 +12,7 @@ Label_length = (4,10)
 generated_image_size=(256,64)
 
 ## Number of images to be generated & saved
-Iteration = 200
+Iteration = 10
 
 ## Location of source character images
 data_directory = './CNN_letter_dataset'
@@ -75,6 +75,17 @@ def random_label (label_length=(4,10)):
 if __name__ == '__main__':
     Filename_list = []
     Label_list = []
+
+    ## File deletion (generated dataset directory)
+    for filename in os.listdir(Generated_dataset_directory):
+        file_path = os.path.join(Generated_dataset_directory, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    ## Plate image generation
     for i in range(Iteration):
         PlateImage_Filename = f'Plate_{i}.png'
         tmp_label, tmp_plate_image = PLATE_dataset_generation(LABEL_Length=Label_length)
