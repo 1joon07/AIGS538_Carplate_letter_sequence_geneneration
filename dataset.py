@@ -30,7 +30,7 @@ class LicensePlateDataset(Dataset):
         label_str = self.labels.get(img_name, "")
         label = self.format_label(label_str)
         # print(img_name)
-        print(image)
+        # print(image)
         # print(label)
         return image, label
 

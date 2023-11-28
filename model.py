@@ -56,25 +56,25 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
 
         self.localization = nn.Sequential(
-                    nn.Conv2d(1, 48, kernel_size=5, stride=1, padding=0),
-                    nn.BatchNorm2d(48),
-                    nn.ReLU(),
-                    nn.MaxPool2d(kernel_size=2, stride=2, return_indices=True),
+                nn.Conv2d(in_channels=1, out_channels=48, kernel_size=5, stride=1),
+                nn.BatchNorm2d(48),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=(2, 2), stride=2),
 
-                    nn.Conv2d(48, 32, kernel_size=5, stride=1, padding=0),
-                    nn.BatchNorm2d(32),
-                    nn.ReLU(),
-                    nn.MaxPool2d(kernel_size=2, stride=2, return_indices=True),
+                nn.Conv2d(in_channels=48, out_channels=32, kernel_size=5, stride=1),
+                nn.BatchNorm2d(32),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=(2, 2), stride=2),
 
-                    nn.Linear(in_features=32 * 5 * 21, out_features=50),
-                    nn.BatchNorm1d(50),
-                    nn.ReLU(),
-                    nn.Linear(in_features=50, out_features=6),
-                    nn.BatchNorm1d(6),
-                    nn.ReLU()
+                nn.Flatten(),
+                nn.Linear(in_features=32 * 5 * 21, out_features=50),
+                nn.ReLU(),
+                nn.Linear(in_features=50, out_features=6),
+                nn.ReLU()
+
         )
 
-        self.conv1 = nn.Sequential(nn.Conv2d(6, 64, kernel_size=(5, 5), stride=1, padding=0), nn.BatchNorm2d(64), nn.ReLU())
+        self.conv1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=(5, 5), stride=1, padding=0), nn.BatchNorm2d(64), nn.ReLU())
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2, return_indices=True)
         self.dropout1 = nn.Dropout(p=0.25)
 
@@ -86,10 +86,10 @@ class CNN(nn.Module):
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2, return_indices=True)
         self.dropout3 = nn.Dropout(p=0.25)
 
-        self.fc1 = nn.Sequential(nn.Linear(in_features=256, out_features=1024), nn.BatchNorm1d(1024), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Flatten(), nn.Linear(in_features=5120, out_features=1024), nn.ReLU())
         
         self.parallel_layers = nn.ModuleList([
-            nn.Sequential(nn.Linear(in_features=1024, out_features=37),nn.BatchNorm1d(37), nn.Softmax()) 
+            nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
             for _ in range(11)
         ])
 
@@ -105,9 +105,7 @@ class CNN(nn.Module):
 
 
     def stlayer(self, x):
-        xs = self.localization(x)
-        xs = xs.view(-1, 10 * 3 * 3)
-        theta = self.fc_loc(xs)
+        theta = self.localization(x)
         theta = theta.view(-1, 2, 3)
 
         grid = F.affine_grid(theta, x.size())
@@ -117,9 +115,6 @@ class CNN(nn.Module):
 
     def forward(self, x):
         x = self.stlayer(x)
-        print(x.size())
-        x = x.view(x.size(0), 6, 1, 1)
-        print(x.size())
         x = self.conv1(x)
         x, p1 = self.pool1(x)
         x = self.dropout1(x)
@@ -132,9 +127,7 @@ class CNN(nn.Module):
         x, p3 = self.pool3(x)
         x = self.dropout3(x)
 
-        print(x.size())
         x = x.view(x.size(0), -1)
-        print(x.size())
         x = self.fc1(x)
         l = []
         for layer in self.parallel_layers:
