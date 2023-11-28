@@ -36,5 +36,46 @@ class LicensePlateDataset(Dataset):
 
     @staticmethod
     def format_label(label_str):
+        character_dict = {
+            '0': 0,
+            '1': 1,
+            '2': 2,
+            '3': 3,
+            '4': 4,
+            '5': 5,
+            '6': 6,
+            '7': 7,
+            '8': 8,
+            '9': 9,
+            'A': 10,
+            'B': 11,
+            'C': 12,
+            'D': 13,
+            'E': 14,
+            'F': 15,
+            'G': 16,
+            'H': 17,
+            'I': 18,
+            'J': 19,
+            'K': 20,
+            'L': 21,
+            'M': 22,
+            'N': 23,
+            'P': 24,
+            'Q': 25,
+            'R': 26,
+            'S': 27,
+            'T': 28,
+            'U': 29,
+            'V': 30,
+            'W': 31,
+            'X': 32,
+            'Y': 33,
+            'Z': 34,
+            'NULL': 35
+        }
         label_list = list(label_str) + ['NULL'] * (11 - len(label_str))
-        return label_list[:11]
+        label_list_classnum = []
+        for character in label_list:
+            label_list_classnum.append(character_dict[character])
+        return label_list_classnum[:11]

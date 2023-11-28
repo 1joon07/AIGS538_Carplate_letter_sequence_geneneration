@@ -6,13 +6,13 @@ import pandas as pd
 
 ## Plate label length setting
 ## (x,y) -> length variation from x to y
-Label_length = (4,10)
+Label_length = (4,11)
 
 ## Generated image resolution
 generated_image_size=(256,64)
 
 ## Number of images to be generated & saved
-Iteration = 10
+Iteration = 1000
 
 ## Location of source character images
 data_directory = './CNN_letter_dataset'
