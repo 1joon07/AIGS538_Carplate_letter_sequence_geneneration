@@ -52,7 +52,7 @@ import torchvision.models as models
 
 
 class CNN(nn.Module):
-    def __init__(self, init_weights=True):
+    def __init__(self, init_weights=False):
         super(CNN, self).__init__()
 
         self.localization = nn.Sequential(
@@ -67,9 +67,9 @@ class CNN(nn.Module):
                 nn.MaxPool2d(kernel_size=(2, 2), stride=2),
 
                 nn.Flatten(),
-                nn.Linear(in_features=32 * 5 * 21, out_features=50),
+                nn.Linear(in_features=18720, out_features=100),
                 nn.ReLU(),
-                nn.Linear(in_features=50, out_features=6),
+                nn.Linear(in_features=100, out_features=6),
                 nn.ReLU()
 
         )
@@ -86,12 +86,21 @@ class CNN(nn.Module):
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
         self.dropout3 = nn.Dropout(p=0.25)
 
-        self.fc1 = nn.Sequential(nn.Flatten(), nn.Linear(in_features=5120, out_features=1024), nn.ReLU())
+        self.conv4 = nn.Sequential(nn.Conv2d(256, 512, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(512), nn.ReLU())
+        self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.dropout4 = nn.Dropout(p=0.25)
+
+        self.conv5 = nn.Sequential(nn.Conv2d(512, 256, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(256), nn.ReLU())
+        self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.dropout5 = nn.Dropout(p=0.25)
+
+        self.fc1 = nn.Sequential(nn.Flatten(), nn.Linear(in_features=8448, out_features=1024), nn.ReLU())
         
-        self.parallel_layers = nn.ModuleList([
-            nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
-            for _ in range(11)
-        ])
+        # self.parallel_layers = nn.ModuleList([
+        #     nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
+        #     for _ in range(11)
+        # ])
+        self.output = nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax(dim=1))
 
         self.fc_loc = nn.Sequential(
             nn.Linear(10 * 3 * 3, 32),
@@ -108,13 +117,13 @@ class CNN(nn.Module):
         theta = self.localization(x)
         theta = theta.view(-1, 2, 3)
 
-        grid = F.affine_grid(theta, x.size())
-        x = F.grid_sample(x, grid)
+        grid = F.affine_grid(theta, x.size(), align_corners=False)
+        x = F.grid_sample(x, grid, align_corners=False)
 
         return x
 
     def forward(self, x):
-        x = self.stlayer(x)
+        # x = self.stlayer(x)
         x = self.conv1(x)
         x = self.pool1(x)
         x = self.dropout1(x)
@@ -127,13 +136,34 @@ class CNN(nn.Module):
         x = self.pool3(x)
         x = self.dropout3(x)
 
+        x = self.conv4(x)
+        x = self.pool4(x)
+        x = self.dropout4(x)
+
+        x = self.conv5(x)
+        # x = self.pool5(x)
+        x = self.dropout5(x)
+
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
-        l = []
-        for layer in self.parallel_layers:
-            l.append(layer(x))
+        # l = []
+        # for layer in self.parallel_layers:
+        #     l.append(layer(x))
 
-        return l
+        out0 = self.output(x)
+        out1 = self.output(x)
+        out2 = self.output(x)
+        out3 = self.output(x)
+        out4 = self.output(x)
+        out5 = self.output(x)
+        out6 = self.output(x)
+        out7 = self.output(x)
+        out8 = self.output(x)
+        out9 = self.output(x)
+        out10 = self.output(x)
+
+
+        return out0, out1, out2, out3, out4, out5, out6, out7, out8, out9, out10
 
     def init_weights_function(self):
         for m in self.modules():

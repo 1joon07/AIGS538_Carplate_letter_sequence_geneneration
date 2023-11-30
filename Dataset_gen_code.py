@@ -12,7 +12,7 @@ Label_length = (4,11)
 generated_image_size=(256,64)
 
 ## Number of images to be generated & saved
-Iteration = 1000
+Iteration = 400
 
 ## Location of source character images
 data_directory = './CNN_letter_dataset'
@@ -20,7 +20,7 @@ data_directory = './CNN_letter_dataset'
 ## Location of the generated dataset
 ## a .csv file -> a list of labels
 ## .png files -> generated images
-Generated_dataset_directory='./CNN_generated_dataset'
+Generated_dataset_directory='./CNN_generated_dataset_val'
 
 def plate_image_concatenation (label_sequence= 'ALIS'):
 

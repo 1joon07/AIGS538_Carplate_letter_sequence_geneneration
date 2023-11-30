@@ -14,7 +14,7 @@ class LicensePlateDataset(Dataset):
         self.images = [img for img in os.listdir(directory) if img.endswith('.png')]
         self.transform = transforms.Compose([
             transforms.Grayscale(),
-            transforms.Resize((32, 96)),
+            transforms.Resize((64, 192)),
             transforms.ToTensor()
         ])
 
