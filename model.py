@@ -66,8 +66,13 @@ class CNN(nn.Module):
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=(2, 2), stride=2),
 
+                nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1),
+                nn.BatchNorm2d(64),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=(2, 2), stride=2),
+
                 nn.Flatten(),
-                nn.Linear(in_features=18720, out_features=100),
+                nn.Linear(in_features=9216, out_features=100),
                 nn.ReLU(),
                 nn.Linear(in_features=100, out_features=6),
                 nn.ReLU()
@@ -94,23 +99,23 @@ class CNN(nn.Module):
         self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
         self.dropout5 = nn.Dropout(p=0.25)
 
-        self.fc1 = nn.Sequential(nn.Flatten(), nn.Linear(in_features=8448, out_features=1024), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Flatten())
         
         # self.parallel_layers = nn.ModuleList([
         #     nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
         #     for _ in range(11)
         # ])
-        self.output0 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output1 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output2 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output3 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output4 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output5 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output6 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output7 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output8 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output9 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
-        self.output10 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        self.output0 = nn.Sequential(nn.Linear(in_features=12544, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+        # self.output1 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+        # self.output2 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+        # self.output3 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+        # self.output4 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output5 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output6 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output7 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output8 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output9 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
+        # self.output10 = nn.Sequential(nn.Linear(in_features=1024, out_features=36), nn.Softmax(dim=1))
 
         self.fc_loc = nn.Sequential(
             nn.Linear(10 * 3 * 3, 32),
@@ -133,7 +138,7 @@ class CNN(nn.Module):
         return x
 
     def forward(self, x):
-        # x = self.stlayer(x)
+        x = self.stlayer(x)
         x = self.conv1(x)
         x = self.pool1(x)
         x = self.dropout1(x)
@@ -161,24 +166,26 @@ class CNN(nn.Module):
         #     l.append(layer(x))
 
         out0 = self.output0(x)
-        out1 = self.output1(x)
-        out2 = self.output2(x)
-        out3 = self.output3(x)
-        out4 = self.output4(x)
-        out5 = self.output5(x)
-        out6 = self.output6(x)
-        out7 = self.output7(x)
-        out8 = self.output8(x)
-        out9 = self.output9(x)
-        out10 = self.output10(x)
+        # out1 = self.output1(x)
+        # out2 = self.output2(x)
+        # out3 = self.output3(x)
+        # out4 = self.output4(x)
+        # out5 = self.output5(x)
+        # out6 = self.output6(x)
+        # out7 = self.output7(x)
+        # out8 = self.output8(x)
+        # out9 = self.output9(x)
+        # out10 = self.output10(x)
 
 
-        out = torch.cat([out0.unsqueeze(1), out1.unsqueeze(1), out2.unsqueeze(1), 
-                     out3.unsqueeze(1), out4.unsqueeze(1), out5.unsqueeze(1), 
-                     out6.unsqueeze(1), out7.unsqueeze(1), out8.unsqueeze(1), 
-                     out9.unsqueeze(1), out10.unsqueeze(1)], dim=1)
+        # out = torch.cat([out0.unsqueeze(1), out1.unsqueeze(1), out2.unsqueeze(1),
+        #              out3.unsqueeze(1), out4.unsqueeze(1), out5.unsqueeze(1),
+        #              out6.unsqueeze(1), out7.unsqueeze(1), out8.unsqueeze(1),
+        #              out9.unsqueeze(1), out10.unsqueeze(1)], dim=1)
+
+        # out = torch.cat([out0.unsqueeze(1)], dim=1)
         # print(f'length {out.size()}')
-        return out
+        return out0
 
 
     def init_weights_function(self):

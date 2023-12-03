@@ -8,7 +8,7 @@ import os
 import pandas as pd
 
 class LicensePlateDataset(Dataset):
-    def __init__(self,resize_size=(64, 192), directory='./CNN_generated_dataset', label_file='./CNN_generated_dataset/Labels.csv'):
+    def __init__(self,resize_size=(128, 128), directory='./CNN_generated_dataset', label_file='./CNN_generated_dataset/Labels.csv'):
         self.directory = directory
         self.labels = pd.read_csv(label_file, index_col='Filename').to_dict()['Label']
         self.images = [img for img in os.listdir(directory) if img.endswith('.png')]
@@ -75,8 +75,8 @@ class LicensePlateDataset(Dataset):
             'Z': 34,
             'NULL': 35
         }
-        label_list = list(label_str) + ['NULL'] * (11 - len(label_str))
+        label_list = list(label_str) + ['NULL'] * (1 - len(label_str))
         label_list_classnum = []
         for character in label_list:
             label_list_classnum.append(character_dict[character])
-        return label_list_classnum[:11]
+        return label_list_classnum[:1]
