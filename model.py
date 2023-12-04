@@ -105,7 +105,12 @@ class CNN(nn.Module):
         #     nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
         #     for _ in range(11)
         # ])
-        self.output0 = nn.Sequential(nn.Linear(in_features=4608, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+
+        self.output0 = nn.Sequential(nn.Linear(in_features=2048, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+
+        ## 100x100
+        # self.output0 = nn.Sequential(nn.Linear(in_features=4608, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+
         # self.output1 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
         # self.output2 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
         # self.output3 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
