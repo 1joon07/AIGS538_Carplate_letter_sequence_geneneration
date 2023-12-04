@@ -79,25 +79,25 @@ class CNN(nn.Module):
 
         )
 
-        self.conv1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=(5, 5), stride=1, padding=0), nn.BatchNorm2d(64), nn.ReLU())
+        self.conv1 = nn.Sequential(nn.Conv2d(1, 16, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(16), nn.ReLU())
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout1 = nn.Dropout(p=0.25)
+        # self.dropout1 = nn.Dropout(p=0.25)
 
-        self.conv2 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=(3, 3), stride=1, padding=0), nn.BatchNorm2d(128), nn.ReLU())
+        self.conv2 = nn.Sequential(nn.Conv2d(16, 32, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(32), nn.ReLU())
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout2 = nn.Dropout(p=0.25)
+        # self.dropout2 = nn.Dropout(p=0.25)
 
-        self.conv3 = nn.Sequential(nn.Conv2d(128, 256, kernel_size=(3, 3), stride=1, padding=0), nn.BatchNorm2d(256), nn.ReLU())
+        self.conv3 = nn.Sequential(nn.Conv2d(32, 64, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(64), nn.ReLU())
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout3 = nn.Dropout(p=0.25)
+        # self.dropout3 = nn.Dropout(p=0.25)
 
-        self.conv4 = nn.Sequential(nn.Conv2d(256, 512, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(512), nn.ReLU())
+        self.conv4 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(128), nn.ReLU())
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout4 = nn.Dropout(p=0.25)
+        # self.dropout4 = nn.Dropout(p=0.25)
 
-        self.conv5 = nn.Sequential(nn.Conv2d(512, 256, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(256), nn.ReLU())
-        self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout5 = nn.Dropout(p=0.25)
+        # self.conv5 = nn.Sequential(nn.Conv2d(512, 256, kernel_size=(3, 3), stride=1, padding=1), nn.BatchNorm2d(256), nn.ReLU())
+        # self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
+        # self.dropout5 = nn.Dropout(p=0.25)
 
         self.fc1 = nn.Sequential(nn.Flatten())
         
@@ -105,7 +105,7 @@ class CNN(nn.Module):
         #     nn.Sequential(nn.Linear(in_features=1024, out_features=37), nn.Softmax())
         #     for _ in range(11)
         # ])
-        self.output0 = nn.Sequential(nn.Linear(in_features=12544, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
+        self.output0 = nn.Sequential(nn.Linear(in_features=4608, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
         # self.output1 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
         # self.output2 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
         # self.output3 = nn.Sequential(nn.Linear(in_features=8448, out_features=1024), nn.ReLU(), nn.Linear(in_features=1024, out_features=256), nn.ReLU(), nn.Linear(in_features=256, out_features=36), nn.Softmax(dim=1))
@@ -138,26 +138,26 @@ class CNN(nn.Module):
         return x
 
     def forward(self, x):
-        x = self.stlayer(x)
+        # x = self.stlayer(x)
         x = self.conv1(x)
         x = self.pool1(x)
-        x = self.dropout1(x)
+        # x = self.dropout1(x)
 
         x = self.conv2(x)
         x = self.pool2(x)
-        x = self.dropout2(x)
+        # x = self.dropout2(x)
 
         x = self.conv3(x)
         x = self.pool3(x)
-        x = self.dropout3(x)
-
+        # x = self.dropout3(x)
+        #
         x = self.conv4(x)
         x = self.pool4(x)
-        x = self.dropout4(x)
-
-        x = self.conv5(x)
-        # x = self.pool5(x)
-        x = self.dropout5(x)
+        # x = self.dropout4(x)
+        #
+        # x = self.conv5(x)
+        # # x = self.pool5(x)
+        # x = self.dropout5(x)
 
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
