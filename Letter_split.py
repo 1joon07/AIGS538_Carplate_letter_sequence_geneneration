@@ -23,7 +23,7 @@ def detect_contour(gray_image):
     '''
     Otsu method and binary thresholding to make the constrat sharper 
     '''
-    _, otsu_thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    _, otsu_thresh = cv2.threshold(gray_image, 0, 255,  cv2.THRESH_OTSU)
     return otsu_thresh
     
 def detect_contour_canny(gray_image, lower_threshold = 100, upper_threshold = 255):
@@ -159,14 +159,15 @@ def pipeline_split_letter_wimage(image):
 
 if __name__ == '__main__':
     directory = "./CNN_generated_dataset2"
-    filename = "Plate_1086.png"
+    filename = "Plate_10.png"
 
     image_path = os.path.join(directory, filename)
+    # image_path = "./test_plate.png"
     gray_image = load_image(image_path)
     otsu_image = detect_contour(gray_image)
-    # edge_image = detect_contour_canny(gray_image)
+    edge_image = detect_contour_canny(gray_image)
 
-    # plot_detect_contour(gray_image, otsu_image)
+    plot_detect_contour(gray_image, otsu_image)
     # plot_detect_contour(gray_image, edge_image)
 
     black_pixel_counts = count_black_pixels_per_column(otsu_image)
