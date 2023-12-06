@@ -6,13 +6,13 @@ import pandas as pd
 
 ## Plate label length setting
 ## (x,y) -> length variation from x to y
-Label_length = (3,3)
+Label_length = (3,8)
 
 ## Generated image resolution
 generated_image_size=(256,64)
 
 ## Number of images to be generated & saved
-Iteration = 1
+Iteration = 4000
 
 ## Location of source character images
 data_directory = './CNN_letter_dataset'
@@ -20,7 +20,7 @@ data_directory = './CNN_letter_dataset'
 ## Location of the generated dataset
 ## a .csv file -> a list of labels
 ## .png files -> generated images
-Generated_dataset_directory='./test_gen'
+Generated_dataset_directory='./CNN_generated_dataset2'
 
 def plate_image_concatenation (label_sequence= 'ALIS'):
 
@@ -66,8 +66,15 @@ def plate_image_concatenation (label_sequence= 'ALIS'):
         average_pixel2 = tuple(sum(c) // len(below_threshold_pixels2) for c in zip(*below_threshold_pixels2))
 
         for y in range(max_height):
-            new_im.putpixel((starting_point-1, y), average_pixel1)
-            new_im.putpixel((starting_point+10, y), average_pixel2)
+            try:
+                new_im.putpixel((starting_point-1, y), average_pixel1)
+            except TypeError:
+                new_im.putpixel((starting_point-1, y), (255, 255, 255)) 
+            try:
+                new_im.putpixel((starting_point+10, y), average_pixel2)
+            except TypeError:
+                new_im.putpixel((starting_point+10, y), (255, 255, 255))
+
 
         for i in range(10):
             alpha = i / (10 + 1)

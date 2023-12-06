@@ -26,10 +26,10 @@ def detect_contour(gray_image):
     _, otsu_thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return otsu_thresh
     
-# def detect_contour(gray_image, lower_threshold = 100, upper_threshold = 255):
-#     canny_edges = cv2.Canny(gray_image, lower_threshold, upper_threshold)
-#     _, edges = cv2.threshold(canny_edges, 0, 255, cv2.THRESH_BINARY)
-#     return edges
+def detect_contour_canny(gray_image, lower_threshold = 100, upper_threshold = 255):
+    canny_edges = cv2.Canny(gray_image, lower_threshold, upper_threshold)
+    _, edges = cv2.threshold(canny_edges, 0, 255, cv2.THRESH_BINARY)
+    return edges
 
 def plot_detect_contour(original_image, contour_image):
     plt.subplot(1, 2, 1)
@@ -44,38 +44,55 @@ def plot_detect_contour(original_image, contour_image):
 
     plt.show()
 
-def count_white_pixels_per_column(image):
+def count_black_pixels_per_column(image):
     """
-    Count the number of white pixels in each column of the image.( this histogram will be used to split letters)
+    Count the number of black pixels in each column of the image.( this histogram will be used to split letters)
     """
     height, width = image.shape
-    white_pixel_counts = []
+    black_pixel_counts = []
     for col in range(width):
         column = image[:, col]
-        white_pixels = np.sum(column < 20)
-        white_pixel_counts.append(white_pixels)
+        black_pixels = np.sum(column < 20)
+        black_pixel_counts.append(black_pixels)
 
-    return white_pixel_counts
+    return black_pixel_counts
 
 def plot_histogram(white_pixel_counts):
     plt.bar(range(len(white_pixel_counts)), white_pixel_counts)
     plt.xlabel('Column Index')
-    plt.ylabel('White Pixel Count')
-    plt.title('White Pixel Counts Per Column')
+    plt.ylabel('Pixel Count')
+    plt.title('Pixel Counts Per Column')
     plt.show()
 
-def slice_image_based_on_histogram(gray_image, white_pixel_counts, threshold=5):
+
+# def count_white_pixels_per_column(image):
+#     """
+#     Count the number of black pixels in each column of the image.( this histogram will be used to split letters)
+#     """
+#     height, width = image.shape
+#     white_pixel_counts = []
+#     for col in range(width):
+#         column = image[:, col]
+#         white_pixels = np.sum(column > 200)
+#         white_pixel_counts.append(white_pixels)
+
+#     return white_pixel_counts
+
+
+def slice_image_based_on_histogram(gray_image, black_pixel_counts, threshold=5, threshold_columns=10):
     """
-    Slice the image into smaller images based on the histogram of white pixel counts.
+    Slice the image into smaller images based on the histogram of black pixel counts.
+    Each slice must be at least 'threshold_columns' wide.
     """
     start_idx = None
     slices = []
-    for idx, count in enumerate(white_pixel_counts):
+    for idx, count in enumerate(black_pixel_counts):
         if count >= threshold and start_idx is None:
             start_idx = idx
-        elif (count <= threshold or idx == len(white_pixel_counts) - 1) and start_idx is not None:
-            slice_img = gray_image[:, start_idx:idx]
-            slices.append(slice_img)
+        elif start_idx is not None and (count <= threshold or idx == len(black_pixel_counts) - 1):
+            if idx - start_idx >= threshold_columns:
+                slice_img = gray_image[:, start_idx:idx]
+                slices.append(slice_img)
             start_idx = None
     return slices
 
@@ -110,29 +127,64 @@ def slice_image_based_on_histogram(gray_image, white_pixel_counts, threshold=5):
 #     return letters
 
 
-#directory = "./CNN_generated_dataset"
-image_path = "test_plate.png"
+def pipeline_split_letter_wpath(image_path):
+    '''
+        Function to split letter.
+        Input : path to the original
+        Output : a list of image which contains 1 characters
+    '''
+    if not os.path.exists(image_path):
+        print(f"Error: The file '{image_path}' does not exist.")
+        return None
+    image = cv2.imread(image_path)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    otsu_image = detect_contour(gray_image)
+    # edge_image = detect_contour_canny(gray_image)
+    black_pixel_counts = count_black_pixels_per_column(otsu_image)
+    # white_pixel_counts = count_white_pixels_per_column(edge_image)
+    slices = slice_image_based_on_histogram(gray_image, black_pixel_counts)
+    return slices
 
-#image_path = os.path.join(directory, filename)
-gray_image = load_image(image_path)
-edge_image = detect_contour(gray_image)
-plot_detect_contour(gray_image, edge_image)
+def pipeline_split_letter_wimage(image):
+    '''
+        Function to split letter.
+        Input : the original image ( RGB )
+        Output : a list of image which contains 1 characters
+    '''
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    edge_image = detect_contour(gray_image)
+    black_pixel_counts = count_black_pixels_per_column(edge_image)
+    slices = slice_image_based_on_histogram(gray_image, black_pixel_counts)
+    return slices
 
-white_pixel_counts = count_white_pixels_per_column(edge_image)
-plot_histogram(white_pixel_counts)
+if __name__ == '__main__':
+    directory = "./CNN_generated_dataset2"
+    filename = "Plate_1086.png"
 
-slices = slice_image_based_on_histogram(gray_image, white_pixel_counts)
+    image_path = os.path.join(directory, filename)
+    gray_image = load_image(image_path)
+    otsu_image = detect_contour(gray_image)
+    # edge_image = detect_contour_canny(gray_image)
 
-for i, slice_img in enumerate(slices):
-    plt.imshow(slice_img, cmap='gray')
-    plt.title(f"Slice {i+1}")
-    plt.show()
+    # plot_detect_contour(gray_image, otsu_image)
+    # plot_detect_contour(gray_image, edge_image)
+
+    black_pixel_counts = count_black_pixels_per_column(otsu_image)
+    plot_histogram(black_pixel_counts)
+
+    # white_pixel_counts = count_white_pixels_per_column(edge_image)
+    # plot_histogram(white_pixel_counts)
+
+    slices = slice_image_based_on_histogram(gray_image, black_pixel_counts)
+    print(len(slices))
+    for i, slice_img in enumerate(slices):
+        plt.imshow(slice_img, cmap='gray')
+        plt.title(f"Slice {i+1}")
+        plt.show()
 
 # labels = determine_number_of_letters(edge_image)
 # limits = find_limits(labels)
 # letters = split_letter(gray_image, limits)
-
-# Vous pouvez maintenant traiter chaque lettre individuellement
 # for letter in letters:
 #     plt.imshow(letter, cmap='gray')
 #     plt.show()

@@ -3,3 +3,6 @@ test_generated/
 Legacy
 Legacy2
 CNN_letter_dataset/
+CNN_generated_dataset2/
+CNN_letter_dataset_test/
+CNN_letter_dataset_val/
