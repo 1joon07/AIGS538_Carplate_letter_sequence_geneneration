@@ -136,7 +136,7 @@ def slice_image_based_on_histogram(gray_image, black_pixel_counts, threshold=5, 
 #     return letters
 
 
-def pipeline_split_letter_wpath(image_path):
+def pipeline_split_letter_wpath(image_path, save_directory='result_seg'):
     '''
         Function to split letter.
         Input : path to the original
@@ -169,9 +169,9 @@ def pipeline_split_letter_wimage(image):
 if __name__ == '__main__':
     # directory = "./CNN_generated_dataset2"
     # filename = "Plate_10.png"
-
+    # save_directory = 'result_seg'
     # image_path = os.path.join(directory, filename)
-    # image_path = "./test_plate.png"
+    #image_path = "./test_plate.png"
     # image_path = "result_2.png"
     image_path = "result_1.png"
     gray_image = load_image(image_path)
@@ -193,6 +193,10 @@ if __name__ == '__main__':
         plt.imshow(slice_img, cmap='gray')
         plt.title(f"Slice {i+1}")
         plt.show()
+    
+    # for i, slice in enumerate(slices):
+    #     file_path = os.path.join(save_directory, f'slice_{i}.png')
+    #     cv2.imwrite(file_path, slice)
 
 # labels = determine_number_of_letters(edge_image)
 # limits = find_limits(labels)
