@@ -82,14 +82,23 @@ def plot_histogram(white_pixel_counts):
 def slice_image_based_on_histogram(gray_image, black_pixel_counts, threshold=5, threshold_columns=10):
     """
     Slice the image into smaller images based on the histogram of black pixel counts.
-    Each slice must be at least 'threshold_columns' wide.
+    Each slice must be at least 'threshold_columns' wide. The decision to start or end a slice
+    is based on the median count of the current, the  previous, and the  next columns, if they exist.
     """
+    def median_count(idx):  # median to avoid outliner 
+        counts = []
+        for i in range(idx - 1, idx + 2):
+            if 0 <= i < len(black_pixel_counts):
+                counts.append(black_pixel_counts[i])
+        return sorted(counts)[len(counts) // 2]  
+
     start_idx = None
     slices = []
-    for idx, count in enumerate(black_pixel_counts):
-        if count >= threshold and start_idx is None:
+    for idx in range(len(black_pixel_counts)):
+        med_count = median_count(idx)
+        if med_count >= threshold and start_idx is None:
             start_idx = idx
-        elif start_idx is not None and (count <= threshold or idx == len(black_pixel_counts) - 1):
+        elif start_idx is not None and (med_count < threshold or idx == len(black_pixel_counts) - 1):
             if idx - start_idx >= threshold_columns:
                 slice_img = gray_image[:, start_idx:idx]
                 slices.append(slice_img)
@@ -158,11 +167,13 @@ def pipeline_split_letter_wimage(image):
     return slices
 
 if __name__ == '__main__':
-    directory = "./CNN_generated_dataset2"
-    filename = "Plate_10.png"
+    # directory = "./CNN_generated_dataset2"
+    # filename = "Plate_10.png"
 
-    image_path = os.path.join(directory, filename)
+    # image_path = os.path.join(directory, filename)
     # image_path = "./test_plate.png"
+    # image_path = "result_2.png"
+    image_path = "result_1.png"
     gray_image = load_image(image_path)
     otsu_image = detect_contour(gray_image)
     edge_image = detect_contour_canny(gray_image)
